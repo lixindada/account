@@ -22,7 +22,7 @@ const login = {
 }
 // 账单
 const account = {
-    query: (params:any) => { return axios.get(`${base.queryAccount}`, { params: params }) },
+    query: (params:any) => { return axios.post(`${base.queryAccount}`, params) },
     add: (params:any) => { return axios.post(`${base.addAccount}`, params) },
     edit: (params:any) => { return axios.put(`${base.editOrg}`, params) },
     del: (params:any) => { return axios.delete(`${base.delOrg}/${params}`) }

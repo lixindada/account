@@ -4,6 +4,9 @@
  */
 import axios from 'axios'
 import router from '@/router'
+import Vue from 'vue'
+import { Toast } from 'vant'
+Vue.use(Toast)
 
 // 创建axios实例
 var instance = axios.create({
@@ -47,6 +50,7 @@ const errorHandle = (status:any, other:any) => {
     switch (status) {
     // 401: 未登录状态，跳转登录页
     case 401:
+        Toast(other)
         toLogin()
         break
         // 403 token过期
