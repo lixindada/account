@@ -9,8 +9,20 @@ export default new Router({
     routes: [
         {
             path: '/',
-            name: 'index',
-            component: () => import('./components/index.vue')
+            name: 'Home',
+            component: () => import('./views/Home.vue'),
+            children: [
+                {
+                    path: '/',
+                    name: 'index',
+                    component: () => import('./components/index.vue')
+                },
+                {
+                    path: '/summary',
+                    name: 'summary',
+                    component: () => import('./components/summary.vue')
+                }
+            ]
         },
         {
             path: '/login',

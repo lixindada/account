@@ -2,57 +2,50 @@
 <template>
     <div class="index box">
         <!-- title -->
-        <!-- <div class="screen">
+        <div class="screen">
             <van-row>
                 <van-col span="8">
-                    <span @click="clickScreen(1)">{{params.create_time_begin ? params.create_time_begin : "请选择开始时间"}}</span>
+                    <span @click="clickScreen(3)">{{params.create_time_begin ? params.create_time_begin : "请选择统计月份"}}</span>
+                </van-col>
+                <!-- <van-col span="8">
+                <span @click="clickScreen(1)">{{params.create_time_begin ? params.create_time_begin : "请选择开始时间"}}</span>
                 </van-col>
                 <van-col span="8">
-                    <span @click="clickScreen(2)">{{params.create_time_end ? params.create_time_end : "请选择结束时间"}}</span>
-                </van-col>
+                <span @click="clickScreen(2)">{{params.create_time_end ? params.create_time_end : "请选择结束时间"}}</span>
+                </van-col> -->
             </van-row>
-        </div> -->
-        <van-tabs v-model="active" sticky @click="tabClick">
-            <van-button round class="add-btn" type="danger" size="small" @click="onClickRight">添加</van-button>
-            <van-tab title="账单列表">
-                <van-cell-group v-for="(item,index) in accountList" :key="index" class="group">
-                    <van-cell title="类型" :value="item.typeName" />
-                    <van-cell title="金额" :value="item.money" />
-                    <van-cell title="备注" :value="item.remark" />
-                    <van-cell title="创建时间" :value="item.create_time" />
-                </van-cell-group>
-            </van-tab>
-            <van-tab title="公费列表">
-                <van-row>
-                    <van-col span="8">
-                        <van-tag type="danger">总计月支出{{sumMoney}}
-                    </van-tag></van-col>
-                </van-row>
-                <van-row>
-                    <van-col span="8" v-for="(item,i) in paping" :key="i">
-                       <van-tag type="primary">({{item.real_name}})<br />月支出{{item.total_money}}元<br />月底结算{{ settlementMoney(item.total_money) }}元</van-tag>
-                    </van-col>
-                </van-row>
-                <van-cell-group v-for="(item,index) in accountList" :key="index" class="group">
-                    <van-cell title="姓名" :value="item.real_name" />
-                    <van-cell title="金额" :value="item.money" />
-                    <van-cell title="备注" :value="item.remark" />
-                    <van-cell title="类型" :value="item.typeName" />
-                    <van-cell title="创建时间" :value="item.create_time" />
-                </van-cell-group>
-            </van-tab>
-        </van-tabs>
+        </div>
+
+       <van-row>
+            <van-col span="8">
+                <van-tag type="danger">总计月支出{{sumMoney}}
+            </van-tag></van-col>
+        </van-row>
+        <van-row>
+            <van-col span="8" v-for="(item,i) in paping" :key="i">
+                <van-tag type="primary">({{item.real_name}})<br />月支出{{item.total_money}}元<br />月底结算{{ settlementMoney(item.total_money) }}元</van-tag>
+            </van-col>
+        </van-row>
         <!-- 时间选择器 -->
         <van-popup
             v-model="show"
             position="bottom"
         >
             <van-datetime-picker
+                v-if="type == 1 || type == 2"
                 @confirm="confirmTime"
                 v-model="currentDate"
                 type="datetime"
                 :min-date="minDate"
                 :max-date="maxDate"
+            />
+            <van-datetime-picker
+                v-if="type == 3"
+                v-model="currentDate"
+                type="year-month"
+                :min-date="minDate"
+                :max-date="maxDate"
+                @confirm="confirmTime"
             />
         </van-popup>
     </div>
@@ -104,19 +97,6 @@ export default class index extends Vue {
     onClickRight () :void{
         this.$router.push('/addAccount')
     }
-    // 点击tab
-    tabClick (name:any, title:any) :void{
-        // console.log(name,title);
-        if (name === 1) {
-            this.params.type = 13
-            this.params.is_public = 1
-            this.getAccount()
-        } else {
-            this.params.type = 0
-            this.params.is_public = 0
-            this.getAccount()
-        }
-    }
     // 点击时间筛选
     clickScreen (e:any) {
         this.show = true
@@ -126,14 +106,30 @@ export default class index extends Vue {
         this.show = false
         let d = new Date(e)
         let datetime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds()
-        if (this.type === 1) {
+        switch (this.type) {
+        case 1:
             this.params.create_time_begin = datetime
-        } else {
+            break
+        case 2:
             this.params.create_time_end = datetime
+            break
+        case 3:
+            console.log(e)
+            var year = d.getFullYear()
+            var month:any = d.getMonth() + 1
+            month = month < 10 ? '0' + month : month
+            var day = new Date(year, month, 0)
+            this.params.create_time_begin = year + '-' + month + '-01 00:00:00'
+            this.params.create_time_end = year + '-' + month + '-' + day.getDate() + ' 23:59:59'
+            break
+        default:
+            break
         }
         this.getAccount()
     }
     mounted () {
+        this.params.type = 13
+        this.params.is_public = 1
         this.getAccount()
     }
 }
